@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
 import type { Book } from "./types/Book";
 
+type SortBy = "title" | "id";
+
 function BookList() {
 
     const [books, setBooks] = useState<Book[]>([]);
     const [resultsPerPage, setResultsPerPage] = useState<number>(10);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalBooks, setTotalBooks] = useState<number>(0);
-    const [sortBy, setSortBy] = useState<"title" | "id">("title");
+    const [sortBy, setSortBy] = useState<SortBy>("title");
 
     useEffect(() => {
         const fetchBooks = async () => {
             // Use Vite dev-server proxy (see vite.config.ts)
-            const response = await fetch(`/api/book?page=${currentPage}&pageSize=${resultsPerPage}&sortBy=${sortBy}`);
+            const response = await fetch(
+                `/api/book?page=${currentPage}&pageSize=${resultsPerPage}&sortBy=${sortBy}`
+            );
             if (!response.ok) {
                 const text = await response.text().catch(() => "");
                 throw new Error(`GET /api/book failed: ${response.status} ${response.statusText} ${text}`);
@@ -54,24 +58,22 @@ function BookList() {
         <div className="container py-4">
             <h1 className="mb-4 text-center">Book List</h1>
 
-            <div className="d-flex justify-content-end align-items-center gap-3 mb-3">
+            <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                 <div className="d-flex align-items-center">
-                    <label htmlFor="sortBy" className="me-2 mb-0 fw-semibold">Sort By:</label>
+                    <label htmlFor="sortBy" className="me-2 mb-0 fw-semibold">Sort by:</label>
                     <select
                         id="sortBy"
                         className="form-select form-select-sm w-auto"
                         value={sortBy}
-                        onChange={e => {
-                            const nextSort = e.target.value as "title" | "id";
-                            setSortBy(nextSort);
+                        onChange={(e) => {
+                            setSortBy(e.target.value as SortBy);
                             setCurrentPage(1);
                         }}
                     >
-                        <option value="title">Title</option>
-                        <option value="id">ID</option>
+                        <option value="title">Book Title</option>
+                        <option value="id">Book ID</option>
                     </select>
                 </div>
-
                 <div className="d-flex align-items-center">
                     <label htmlFor="resultsPerPage" className="me-2 mb-0 fw-semibold">Results Per Page:</label>
                     <select

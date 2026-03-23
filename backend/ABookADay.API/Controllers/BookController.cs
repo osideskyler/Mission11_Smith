@@ -27,12 +27,17 @@ namespace ABookADay.API.Controllers
 
             var skip = (page - 1) * pageSize;
 
-            IQueryable<Book> query = _context.Books;
+            var query = _context.Books.AsQueryable();
 
-            // Keep ordering deterministic so paging does not jump around.
-            query = sortBy.ToLowerInvariant() == "id"
-                ? query.OrderBy(b => b.BookId)
-                : query.OrderBy(b => b.Title).ThenBy(b => b.BookId);
+            // Stable ordering for deterministic paging.
+            if (string.Equals(sortBy, "id", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.OrderBy(b => b.BookId);
+            }
+            else
+            {
+                query = query.OrderBy(b => b.Title).ThenBy(b => b.BookId);
+            }
 
             return query
                 .Skip(skip)
