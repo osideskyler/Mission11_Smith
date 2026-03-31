@@ -19,15 +19,20 @@ namespace ABookADay.API.Controllers
         [HttpGet]
         public IEnumerable<Book> GetBooks(
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10,
-            [FromQuery] string sortBy = "title")
+            [FromQuery] int pageSize = 10, 
+            [FromQuery] string sortBy = "title",
+            [FromQuery] List<string>? categories = null)
         {
             page = Math.Max(page, 1);
             pageSize = Math.Max(pageSize, 1);
 
             var skip = (page - 1) * pageSize;
 
-            var query = _context.Books.AsQueryable();
+            IQueryable<Book> query = _context.Books.AsQueryable();
+            if (categories != null)
+            {
+                query = query.Where(b => categories.Contains(b.Category));
+            }
 
             // Stable ordering for deterministic paging.
             if (string.Equals(sortBy, "id", StringComparison.OrdinalIgnoreCase))
@@ -49,6 +54,17 @@ namespace ABookADay.API.Controllers
         public int GetBookCount()
         {
             return _context.Books.Count();
+        }
+
+        [HttpGet("types")]
+        public IActionResult GetBookTypes()
+        {
+            var bookTypes = _context.Books
+                .Select(b => b.Category)
+                .Distinct()
+                .OrderBy(c => c)
+                .ToList();
+            return Ok(bookTypes);
         }
     }
 }

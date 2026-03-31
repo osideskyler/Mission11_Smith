@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
-import type { Book } from "./types/Book";
+import type { Book } from "../types/Book";
+import { useNavigate } from "react-router-dom";
 
 type SortBy = "title" | "id";
 
-function BookList() {
+function BookList({selectedCategories, onCategoryChange}: {selectedCategories: string[], onCategoryChange: (categories: string[]) => void}) {
 
     const [books, setBooks] = useState<Book[]>([]);
     const [resultsPerPage, setResultsPerPage] = useState<number>(10);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalBooks, setTotalBooks] = useState<number>(0);
     const [sortBy, setSortBy] = useState<SortBy>("title");
-
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchBooks = async () => {
+
+            const categoryParams = selectedCategories.map(category => `category=${category}`).join('&');
             // Use Vite dev-server proxy (see vite.config.ts)
             const response = await fetch(
                 `/api/book?page=${currentPage}&pageSize=${resultsPerPage}&sortBy=${sortBy}`
@@ -56,8 +59,6 @@ function BookList() {
 
     return (
         <div className="container py-4">
-            <h1 className="mb-4 text-center">Book List</h1>
-
             <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                 <div className="d-flex align-items-center">
                     <label htmlFor="sortBy" className="me-2 mb-0 fw-semibold">Sort by:</label>
@@ -102,7 +103,10 @@ function BookList() {
                         <p className="mb-1"><strong>Classification: </strong> {b.classification}</p>
                         <p className="mb-1"><strong>Category: </strong> {b.category}</p>
                         <p className="mb-1"><strong>Pages: </strong> {b.pageCount}</p>
-                        <p className="mb-0"><strong>Price: </strong> ${b.price.toFixed(2)}</p>
+                        <p className="mb-3"><strong>Price: </strong> ${b.price.toFixed(2)}</p>
+                        <button type="button" className="btn btn-primary btn-sm" onClick={() => navigate(`/donate/${encodeURIComponent(b.title)}`)}>
+                            Donate
+                        </button>
                     </div>
                 </div>
             ))}
@@ -144,5 +148,4 @@ function BookList() {
         </div>
     );
 }
-
 export default BookList;
