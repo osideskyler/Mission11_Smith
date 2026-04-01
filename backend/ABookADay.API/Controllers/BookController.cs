@@ -29,7 +29,7 @@ namespace ABookADay.API.Controllers
             var skip = (page - 1) * pageSize;
 
             IQueryable<Book> query = _context.Books.AsQueryable();
-            if (categories != null)
+            if (categories != null && categories.Count > 0)
             {
                 query = query.Where(b => categories.Contains(b.Category));
             }
@@ -51,9 +51,14 @@ namespace ABookADay.API.Controllers
         }
 
         [HttpGet("count")]
-        public int GetBookCount()
+        public int GetBookCount([FromQuery] List<string>? categories = null)
         {
-            return _context.Books.Count();
+            IQueryable<Book> query = _context.Books.AsQueryable();
+            if (categories != null && categories.Count > 0)
+            {
+                query = query.Where(b => categories.Contains(b.Category));
+            }
+            return query.Count();
         }
 
         [HttpGet("types")]

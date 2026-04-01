@@ -1,6 +1,7 @@
 import WelcomeBand from "../components/WelcomeBand";
 import CategoryFilter from "../components/CategoryFilter";
 import BookList from "../components/BookList";
+import CartSummary from "../components/CartSummary";
 import { useState } from "react";
 
 function BookPage() {
@@ -14,7 +15,11 @@ function BookPage() {
           <CategoryFilter selectedCategories={selectedCategories} onCategoryChange={setSelectedCategories}/>
         </div>
         <div className="col-12 col-md-8">
-          <BookList selectedCategories={selectedCategories} onCategoryChange={setSelectedCategories}/>
+          <CartSummary />
+          <BookList
+            selectedCategories={selectedCategories}
+            onRestoreCategories={setSelectedCategories}
+          />
         </div>
       </div>
     </div>

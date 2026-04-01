@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ABookADay.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a8b728713aec4429c200a81595d628f3dba18a74")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+771edfef20c130b980f5cde584a332207acc75be")]
 [assembly: System.Reflection.AssemblyProductAttribute("ABookADay.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ABookADay.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

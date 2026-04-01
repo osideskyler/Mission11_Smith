@@ -5,8 +5,7 @@ function CategoryFilter({selectedCategories, onCategoryChange}: {selectedCategor
     const [bookTypes, setBookTypes] = useState<string[]>([]);
     useEffect(() => {
         const fetchBookTypes = async () => {
-            const categoryParams = selectedCategories.map(category => `category=${category}`).join('&');
-            const response = await fetch(`/api/book/types?${categoryParams}`); 
+            const response = await fetch("/api/book/types");
             if (!response.ok) {
                 const text = await response.text().catch(() => "");
                 throw new Error(`GET /api/book/types failed: ${response.status} ${response.statusText} ${text}`);
@@ -29,7 +28,14 @@ function CategoryFilter({selectedCategories, onCategoryChange}: {selectedCategor
             <div className="category-list">
                 {bookTypes.map((type) => (
                     <div className="category-item" key={type}>
-                        <input type="checkbox" id={type} name={type} onChange={handleChange} />
+                        <input
+                            type="checkbox"
+                            id={type}
+                            name={type}
+                            value={type}
+                            checked={selectedCategories.includes(type)}
+                            onChange={handleChange}
+                        />
                         <label htmlFor={type}>{type}</label>
                     </div>
                 ))}
