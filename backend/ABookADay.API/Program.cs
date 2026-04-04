@@ -11,19 +11,26 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<BookDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("BookConnection")));
 
+var defaultDevOrigins = new[]
+{
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+};
+var configuredOrigins = builder.Configuration.GetSection("CorsOrigins").Get<string[]>() ?? Array.Empty<string>();
+var corsOrigins = defaultDevOrigins
+    .Concat(configuredOrigins.Where(static o => !string.IsNullOrWhiteSpace(o)))
+    .Distinct()
+    .ToArray();
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
         policy
-            .WithOrigins(
-                "http://localhost:3000",
-                "http://127.0.0.1:3000",
-                "http://localhost:5173",
-                "http://127.0.0.1:5173"
-            )
+            .WithOrigins(corsOrigins)
             .AllowAnyHeader()
-            .AllowAnyMethod()
-    );
+            .AllowAnyMethod());
 });
 var app = builder.Build();
 

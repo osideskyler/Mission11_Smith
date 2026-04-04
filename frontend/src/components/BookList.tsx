@@ -2,8 +2,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Book } from "../types/Book";
 import { useNavigate } from "react-router-dom";
 import { BOOK_LIST_RESUME_KEY } from "../types/BookListResume";
-
-type SortBy = "title" | "id";
+import { fetchBooks, fetchBookCount, type SortBy } from "../api/booksAPI";
+import Pagination from "./Pagination";
 
 function BookList({
     selectedCategories,
@@ -42,50 +42,15 @@ function BookList({
         }
     }, [onRestoreCategories]);
     useEffect(() => {
-        const fetchBooks = async () => {
-            const categoryParams =
-                selectedCategories.length > 0
-                    ? "&" +
-                      selectedCategories
-                          .map((c) => `categories=${encodeURIComponent(c)}`)
-                          .join("&")
-                    : "";
-            // Use Vite dev-server proxy (see vite.config.ts). ASP.NET binds List<string> from repeated "categories=" params.
-            const response = await fetch(
-                `/api/book?page=${currentPage}&pageSize=${resultsPerPage}&sortBy=${sortBy}${categoryParams}`
-            );
-            if (!response.ok) {
-                const text = await response.text().catch(() => "");
-                throw new Error(`GET /api/book failed: ${response.status} ${response.statusText} ${text}`);
-            }
-            const data = await response.json();
-            setBooks(data);
-        };
-        fetchBooks();
+        fetchBooks(currentPage, resultsPerPage, sortBy, selectedCategories)
+            .then(setBooks)
+            .catch((err) => console.error(err));
     }, [currentPage, resultsPerPage, sortBy, selectedCategories]);
 
     useEffect(() => {
-        const fetchCount = async () => {
-            const categoryParams =
-                selectedCategories.length > 0
-                    ? "?" +
-                      selectedCategories
-                          .map((c) => `categories=${encodeURIComponent(c)}`)
-                          .join("&")
-                    : "";
-            const response = await fetch(`/api/book/count${categoryParams}`);
-            if (!response.ok) {
-                const text = await response.text().catch(() => "");
-                throw new Error(`GET /api/book/count failed: ${response.status} ${response.statusText} ${text}`);
-            }
-
-            const data = await response.json();
-            setTotalBooks(data);
-        };
-
-        fetchCount().catch((err) => {
-            console.error(err);
-        });
+        fetchBookCount(selectedCategories)
+            .then(setTotalBooks)
+            .catch((err) => console.error(err));
     }, [selectedCategories]);
 
     useLayoutEffect(() => {
@@ -97,7 +62,6 @@ function BookList({
     }, [selectedCategories]);
 
     const totalPages = Math.ceil(totalBooks / resultsPerPage);
-    const pages = totalPages > 0 ? Array.from({ length: totalPages }, (_, i) => i + 1) : [];
 
     useEffect(() => {
         // If the page-size change reduces total pages, keep the current page valid.
@@ -174,40 +138,11 @@ function BookList({
                 </div>
             ))}
 
-            {totalPages > 1 && (
-                <div className="d-flex justify-content-center flex-wrap gap-2 mt-3 pb-3">
-                    <button
-                        className="btn btn-outline-primary btn-sm"
-                        type="button"
-                        disabled={currentPage === 1}
-                        onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-                    >
-                        Prev
-                    </button>
-
-                    {pages.map((page) => (
-                        <button
-                            key={page}
-                            className={`btn btn-sm ${page === currentPage ? "btn-primary" : "btn-outline-primary"}`}
-                            type="button"
-                            disabled={page === currentPage}
-                            onClick={() => setCurrentPage(page)}
-                            aria-current={page === currentPage ? "page" : undefined}
-                        >
-                            {page}
-                        </button>
-                    ))}
-
-                    <button
-                        className="btn btn-outline-primary btn-sm"
-                        type="button"
-                        disabled={currentPage === totalPages}
-                        onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-                    >
-                        Next
-                    </button>
-                </div>
-            )}
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+            />
         </div>
     );
 }

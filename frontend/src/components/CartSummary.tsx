@@ -10,9 +10,10 @@ function CartSummary() {
             <div className="card-body py-2 d-flex flex-wrap align-items-center gap-2">
                 <span>Items: {itemCount}</span>
                 <span>Total: ${getTotal().toFixed(2)}</span>
-                <Link to="/cart" className="ms-auto">
-                    View cart
-                </Link>
+                <div className="ms-auto d-flex gap-2 align-items-center">
+                    <Link to="/admin-books">Admin</Link>
+                    <Link to="/cart">View cart</Link>
+                </div>
             </div>
         </div>
     );

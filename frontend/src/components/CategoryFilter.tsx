@@ -1,19 +1,13 @@
 import { useState, useEffect } from "react";
-import './CategoryFilter.css';
+import "./CategoryFilter.css";
+import { fetchBookTypes } from "../api/booksAPI";
 
 function CategoryFilter({selectedCategories, onCategoryChange}: {selectedCategories: string[], onCategoryChange: (categories: string[]) => void}) {
     const [bookTypes, setBookTypes] = useState<string[]>([]);
     useEffect(() => {
-        const fetchBookTypes = async () => {
-            const response = await fetch("/api/book/types");
-            if (!response.ok) {
-                const text = await response.text().catch(() => "");
-                throw new Error(`GET /api/book/types failed: ${response.status} ${response.statusText} ${text}`);
-            }
-            const data = await response.json();
-            setBookTypes(data);
-        };
-        fetchBookTypes();
+        fetchBookTypes()
+            .then(setBookTypes)
+            .catch((err) => console.error(err));
     }, []);
 
     function handleChange({target}: {target: HTMLInputElement}) {
