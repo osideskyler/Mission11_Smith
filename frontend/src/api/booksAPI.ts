@@ -1,6 +1,5 @@
 import type { Book } from "../types/Book";
-// give me a fall back for the API_URL if it is not set
-export const API_URL = (import.meta.env.VITE_API_URL ?? "https://abookaday-api.azurewebsites.net/Book").replace(/\/$/, "");
+export const API_URL = (import.meta.env.VITE_API_URL || "https://abookaday-api.azurewebsites.net").replace(/\/$/, "");
 
 export type SortBy = "title" | "id";
 
